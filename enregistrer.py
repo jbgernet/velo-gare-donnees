@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Enregistre l'état des stations de vélos en gare (flux GBFS ouverts).
 
-Services suivis : Vélo Fluo (Grand Est, opérateur Fifteen) et Vélos BreizhGo (Bretagne, opérateur Ecovelo).
+Services suivis : Vélo Fluo (Grand Est), Vélos BreizhGo (Bretagne) et une sélection de gares OV-fiets (Pays-Bas).
 Chaque exécution ajoute une ligne par station dans data/<service>_AAAA-MM.csv.
 Une fois par jour, la liste des stations (noms, coordonnées) est aussi sauvegardée.
 Données sous licence ouverte (Licence Ouverte 2.0 pour Fluo, CC-BY-4.0 pour BreizhGo).
@@ -12,9 +12,16 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Pour chaque service : adresse du flux, et liste des stations à garder (None = toutes).
+OVFIETS_STATIONS = {
+    "ww001": "Winterswijk", "wt003": "Weert", "vry001": "Venray", "sk001": "Sneek",
+    "swk002": "Steenwijk", "tl003": "Tiel", "cl003": "Culemborg", "kpn003": "Kampen",
+    "odz001": "Oldenzaal",
+}
 SERVICES = {
-    "velo_fluo": "https://gbfs.partners.fifteen.eu/gbfs/velo-fluo/gbfs.json",
-    "breizhgo": "https://api.gbfs.v2.2.ecovelo.mobi/breizhgo/gbfs.json",
+    "velo_fluo": ("https://gbfs.partners.fifteen.eu/gbfs/velo-fluo/gbfs.json", None),
+    "breizhgo": ("https://api.gbfs.v2.2.ecovelo.mobi/breizhgo/gbfs.json", None),
+    "ov_fiets": ("http://gbfs.openov.nl/ovfiets/gbfs.json", set(OVFIETS_STATIONS)),
 }
 OUT = Path(__file__).parent / "data"
 COLONNES = ["releve_utc", "station_id", "velos_disponibles", "places_disponibles",
@@ -34,9 +41,11 @@ def feed_urls(discovery):
     return {f["name"]: f["url"] for f in langue["feeds"]}
 
 
-def enregistrer(service, url, now):
+def enregistrer(service, url, garder, now):
     urls = feed_urls(fetch(url))
     stations = fetch(urls["station_status"])["data"]["stations"]
+    if garder is not None:
+        stations = [x for x in stations if x.get("station_id") in garder]
     chemin = OUT / f"{service}_{now[:7]}.csv"
     nouveau = not chemin.exists()
     with chemin.open("a", newline="", encoding="utf-8") as f:
@@ -49,16 +58,19 @@ def enregistrer(service, url, now):
                         s.get("is_returning"), s.get("last_reported")])
     info = OUT / f"{service}_stations_{now[:10]}.json"
     if not info.exists() and "station_information" in urls:
-        info.write_text(json.dumps(fetch(urls["station_information"]), ensure_ascii=False),
-                        encoding="utf-8")
+        infos = fetch(urls["station_information"])
+        if garder is not None:
+            infos["data"]["stations"] = [x for x in infos["data"]["stations"]
+                                         if x.get("station_id") in garder]
+        info.write_text(json.dumps(infos, ensure_ascii=False), encoding="utf-8")
 
 
 def main():
     OUT.mkdir(exist_ok=True)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    for service, url in SERVICES.items():
+    for service, (url, garder) in SERVICES.items():
         try:  # l'échec d'un service ne doit pas bloquer l'autre
-            enregistrer(service, url, now)
+            enregistrer(service, url, garder, now)
         except Exception as e:
             with (OUT / "erreurs.log").open("a", encoding="utf-8") as f:
                 f.write(f"{now} {service} {e}\n")
