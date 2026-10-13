@@ -1,0 +1,30 @@
+name: Enregistrer les flux vélo
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # toutes les 5 minutes (GitHub peut retarder de quelques minutes)
+  workflow_dispatch:         # permet aussi un lancement manuel
+
+permissions:
+  contents: write
+
+concurrency:
+  group: enregistrement
+  cancel-in-progress: false
+
+jobs:
+  enregistrer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Relever les flux
+        run: python enregistrer.py
+      - name: Sauvegarder les nouvelles données
+        run: |
+          git config user.name "enregistreur"
+          git config user.email "enregistreur@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || (git commit -m "Relevé $(date -u +%Y-%m-%dT%H:%MZ)" && git pull --rebase && git push)
