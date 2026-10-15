@@ -15,9 +15,9 @@ from pathlib import Path
 # Pour chaque service : adresse du flux, et liste des stations à garder (None = toutes).
 OVFIETS_STATIONS = {
     # Équivalents des villes Fluo (sélection du 15 octobre 2026, gares présentes dans les stats NS)
-    "ac002": "Abcoude", "bnk001": "Bunnik", "bhv002": "Bilthoven", "tl003": "Tiel",
-    "wt003": "Weert", "pt001": "Putten", "hgv003": "Hoogeveen", "Hde001": "'t Harde",
-    "swk002": "Steenwijk", "mp002": "Meppel", "zl004": "Zwolle", "apd001": "Apeldoorn",
+    "ac002": "Abcoude", "bnk001": "Bunnik", "bkl001": "Breukelen", "tl003": "Tiel",
+    "wt003": "Weert", "pt001": "Putten", "hgv003": "Hoogeveen", "hlo001": "Heiloo",
+    "swk002": "Steenwijk", "bmn001": "Brummen", "zl004": "Zwolle", "apd001": "Apeldoorn",
     # Réserve : déjà suivie depuis le 13 octobre
     "cl003": "Culemborg",
 }
