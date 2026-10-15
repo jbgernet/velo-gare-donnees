@@ -14,12 +14,12 @@ from pathlib import Path
 
 # Pour chaque service : adresse du flux, et liste des stations à garder (None = toutes).
 OVFIETS_STATIONS = {
-    # Équivalents des villes Fluo (sélection du 15 octobre 2026)
+    # Équivalents des villes Fluo (sélection du 15 octobre 2026, gares présentes dans les stats NS)
     "ac002": "Abcoude", "bnk001": "Bunnik", "bhv002": "Bilthoven", "tl003": "Tiel",
-    "odz001": "Oldenzaal", "Ns001": "Nunspeet", "hgv003": "Hoogeveen", "bl001": "Beilen",
-    "swk002": "Steenwijk", "hr002": "Heerenveen", "zl004": "Zwolle", "apd001": "Apeldoorn",
-    # Réserve : déjà suivies depuis le 13 octobre, gares NS
-    "wt003": "Weert", "cl003": "Culemborg",
+    "wt003": "Weert", "pt001": "Putten", "hgv003": "Hoogeveen", "Hde001": "'t Harde",
+    "swk002": "Steenwijk", "mp002": "Meppel", "zl004": "Zwolle", "apd001": "Apeldoorn",
+    # Réserve : déjà suivie depuis le 13 octobre
+    "cl003": "Culemborg",
 }
 SERVICES = {
     "velo_fluo": ("https://gbfs.partners.fifteen.eu/gbfs/velo-fluo/gbfs.json", None),
