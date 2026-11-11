@@ -13,3 +13,4 @@
 2026-11-03T16:40:42+00:00 ov_fiets Remote end closed connection without response
 2026-11-08T18:10:40+00:00 ov_fiets HTTP Error 405: Method Not Allowed
 2026-11-09T23:01:12+00:00 breizhgo HTTP Error 504: Gateway Timeout
+2026-11-11T00:40:42+00:00 velo_fluo HTTP Error 500: Internal Server Error
